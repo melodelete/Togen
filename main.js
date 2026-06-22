@@ -90,6 +90,8 @@ app.whenReady().then(() => {
           const y = Math.round((screenHeight - winHeight) / 2);
           win.setBounds({ x, y, width: winWidth, height: winHeight });
           win.show();
+          // Clear the note when showing
+          win.webContents.executeJavaScript('document.getElementById("note").value = "";');
           win.focus();
           // Focus the textarea
           win.webContents.executeJavaScript('document.getElementById("note").focus()');
