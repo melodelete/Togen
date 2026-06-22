@@ -1,14 +1,43 @@
 {
   "name": "Togen",
   "version": "1.0.0",
-  "description": "A Spotlight-like quick note app for Electron",
+  "description": "A quick note app for Electron",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder"
   },
   "author": "MeloDelete",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^30.0.0"
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.melodelete.Togen",
+    "productName": "Togen",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "package.json",
+      "icon.png"
+    ],
+    "linux": {
+      "target": [
+        {
+          "target": "appimage",
+          "arch": [
+            "x64",
+            "i386"
+          ]
+        }
+      ],
+      "icon": "icon.png",
+      "category": "Utility"
+    }
   }
 }

@@ -14,15 +14,8 @@ A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + Shift�
 - Built with Electron, modern JavaScript, and a preload script for secure IPC.
 
 ## Installation
+   
 
-1. **Clone or download** this repository.
-2. Navigate to the project folder:
-   ```bash
-   cd path/to/quick-note-electron
-   ```
-3. Install Electron (dev dependency):
-   ```bash
-   npm install
    ```
 
 ## Usage
@@ -40,7 +33,14 @@ npm start
 - Click outside the window or press **Escape** to hide it.
 
 ## Development
-
+1. **Clone or download** this repository.
+2. Navigate to the project folder:
+   ```bash
+   cd path/to/quick-note-electron
+   ```
+3. Install Electron (dev dependency):
+   ```bash
+   npm install
 ### Project Structure
 
 ```
@@ -74,6 +74,24 @@ If you want to package the app for distribution, tools like [electron-forge](htt
 MIT © MeloDelete
 
 Feel free to modify and redistribute as you wish.
+
+## TODO / Ideas
+
+- Persistent Notes (Auto-save / Restore)
+- Multiple Notes / Slots
+- Rich-text / Markdown Preview
+- Theme Switcher (Light / Dark / System)
+- Pin Note to Screen Edge
+- Quick-Insert Snippets
+- Global Search / Find-in-Note
+- Sound / Visual Feedback
+- Tray / Menu Bar Icon (Optional)
+- Settings Window
+- Drag-to-Move
+- Export / Share
+- Integration with Other Apps
+- Secure / Encrypted Notes (Optional)
+- Automatic Timestamp Header
 
 --- 
 
