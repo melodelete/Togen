@@ -15,6 +15,7 @@ function createWindow() {
     skipTaskbar: true, // hide from taskbar on Windows/Linux
     alwaysOnTop: true,
     focusable: true,
+    show: false, // start hidden
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -58,40 +59,55 @@ app.whenReady().then(() => {
     return Promise.resolve(text);
   });
 
-  // Create window
+  // Create window (hidden)
   createWindow();
 
-  // Register global shortcut Ctrl+Shift+`
-  const backtick = '`';
-  const shortcut = 'Ctrl+Shift+' + backtick;
-  console.log('Registering shortcut:', shortcut);
-  const ret = globalShortcut.register(shortcut, () => {
-    console.log('Shortcut triggered!');
-    if (win) {
-      if (win.isVisible()) {
-        win.hide();
-      } else {
-        // Position window near cursor? For simplicity, center screen
-        const { width, height } = win.getBounds();
-        const { x, y } = require('electron').screen.getPrimaryDisplay().workAreaCenter;
-        win.setBounds({
-          x: x - width / 2,
-          y: y - height / 2,
-          width,
-          height
-        });
-        win.show();
-        win.focus();
-        // Focus the textarea
-        win.webContents.executeJavaScript('document.getElementById("note").focus()');
-      }
-    }
-  });
+  // Try to register global shortcut for Ctrl + Backtick (`)
+  const shortcutsToTry = [
+    'Ctrl+`',
+    'CommandOrControl+`',
+    'Ctrl+Backtick',
+    'CommandOrControl+Backtick',
+    'Ctrl+Backquote',
+    'CommandOrControl+Backquote'
+  ];
 
-  if (!ret) {
-    console.error('Failed to register shortcut:', shortcut);
-  } else {
-    console.log('Shortcut registered successfully:', shortcut);
+  let registered = false;
+  for (const shortcut of shortcutsToTry) {
+    console.log('Attempting to register shortcut:', shortcut);
+    const ret = globalShortcut.register(shortcut, () => {
+      console.log('Shortcut triggered! (via', shortcut + ')');
+      if (win) {
+        if (win.isVisible()) {
+          win.hide();
+        } else {
+          // Center window on primary display
+          const display = require('electron').screen.getPrimaryDisplay();
+          const { width: screenWidth, height: screenHeight } = display.workArea;
+          const winWidth = 400;
+          const winHeight = 60;
+          const x = Math.round((screenWidth - winWidth) / 2);
+          const y = Math.round((screenHeight - winHeight) / 2);
+          win.setBounds({ x, y, width: winWidth, height: winHeight });
+          win.show();
+          win.focus();
+          // Focus the textarea
+          win.webContents.executeJavaScript('document.getElementById("note").focus()');
+        }
+      }
+    });
+
+    if (ret) {
+      console.log('Shortcut registered successfully:', shortcut);
+      registered = true;
+      break; // stop trying others
+    } else {
+      console.error('Failed to register shortcut:', shortcut);
+    }
+  }
+
+  if (!registered) {
+    console.error('Could not register any shortcut for Ctrl+Backtick');
   }
 
   app.on('activate', () => {
