@@ -14,29 +14,21 @@ A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + Shift�
 - Built with Electron, modern JavaScript, and a preload script for secure IPC.
 
 ## Installation
-   
-
-   ```
-
+1. Install AppImage from [releases] (https://github.com/melodelete/Togen/releases)
+2. Grant Permissons To Run
+3. Run AppImage
 ## Usage
-
-Start the application:
-
-```bash
-npm start
-```
-
-- Press **Ctrl + Shift + `** (backtick) to toggle the note window.
+- Press **Ctrl + `** (backtick) to toggle the note window.
 - Type your note inside the textarea.
 - Use **Ctrl + C** to copy selected text to the clipboard.
 - Use **Ctrl + V** to paste clipboard contents at the cursor.
 - Click outside the window or press **Escape** to hide it.
 
 ## Development
-1. **Clone or download** this repository.
+1. **Clone** this repository.
 2. Navigate to the project folder:
    ```bash
-   cd path/to/quick-note-electron
+   cd path/to/togen
    ```
 3. Install Electron (dev dependency):
    ```bash
