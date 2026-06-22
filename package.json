@@ -31,8 +31,7 @@
         {
           "target": "appimage",
           "arch": [
-            "x64",
-            "i386"
+            "x64"
           ]
         }
       ],
