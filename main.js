@@ -43,10 +43,30 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // IPC handlers for clipboard
+  console.log('Setting up IPC handlers');
+  ipcMain.handle('clipboard-write-text', (event, text) => {
+    console.log('clipboard-write-text called with:', text);
+    require('electron').clipboard.writeText(text);
+    return Promise.resolve();
+  });
+
+  ipcMain.handle('clipboard-read-text', async () => {
+    console.log('clipboard-read-text called');
+    const text = require('electron').clipboard.readText();
+    console.log('clipboard-read-text returning:', text);
+    return Promise.resolve(text);
+  });
+
+  // Create window
   createWindow();
 
   // Register global shortcut Ctrl+Shift+`
-  const ret = globalShortcut.register('Ctrl+Shift+Backtick', () => {
+  const backtick = '`';
+  const shortcut = 'Ctrl+Shift+' + backtick;
+  console.log('Registering shortcut:', shortcut);
+  const ret = globalShortcut.register(shortcut, () => {
+    console.log('Shortcut triggered!');
     if (win) {
       if (win.isVisible()) {
         win.hide();
@@ -69,19 +89,10 @@ app.whenReady().then(() => {
   });
 
   if (!ret) {
-    console.error('Failed to register shortcut');
+    console.error('Failed to register shortcut:', shortcut);
+  } else {
+    console.log('Shortcut registered successfully:', shortcut);
   }
-
-  // IPC handlers for clipboard
-  ipcMain.handle('clipboard-write-text', (event, text) => {
-    require('electron').clipboard.writeText(text);
-    return Promise.resolve();
-  });
-
-  ipcMain.handle('clipboard-read-text', async () => {
-    const text = require('electron').clipboard.readText();
-    return Promise.resolve(text);
-  });
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

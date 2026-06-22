@@ -1,12 +1,12 @@
 {
-  "name": "quick-note-electron",
+  "name": "TogenElectron",
   "version": "1.0.0",
   "description": "A Spotlight-like quick note app for Electron",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
-  "author": "MeloDelete",
+  "author": "Melodelete",
   "license": "MIT",
   "devDependencies": {
     "electron": "^30.0.0"

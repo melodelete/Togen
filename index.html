@@ -38,18 +38,24 @@
   <textarea id="note" placeholder="Type a quick note..."></textarea>
 
   <script>
-    // Clipboard handling for Ctrl+C and Ctrl+V
-    document.addEventListener('keydown', (e) => {
+    // Clipboard handling for Clipboard functions (Ctrl+C, Ctrl+V, Ctrl+X)
+    document.addEventListener('keydown', async (e) => {
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
         if (e.key === 'c' || e.key === 'C') {
           e.preventDefault();
           const text = window.getSelection().toString();
           if (text) {
-            window.electronAPI.clipboard.writeText(text);
+            try {
+              await window.electronAPI.clipboard.writeText(text);
+              console.log('Copied to clipboard:', text);
+            } catch (err) {
+              console.error('Failed to write clipboard:', err);
+            }
           }
         } else if (e.key === 'v' || e.key === 'V') {
           e.preventDefault();
-          window.electronAPI.clipboard.readText().then(text => {
+          try {
+            const text = await window.electronAPI.clipboard.readText();
             const textarea = document.getElementById('note');
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
@@ -57,12 +63,15 @@
             textarea.value = value.slice(0, start) + text + value.slice(end);
             textarea.selectionStart = textarea.selectionEnd = start + text.length;
             textarea.focus();
-          });
+            console.log('Pasted from clipboard');
+          } catch (err) {
+            console.error('Failed to read clipboard:', err);
+          }
         }
       }
     });
 
-    // Optional: autofocus on load (will be called from main.js)
+    // Optional: autofocus on load (called from main.js)
     // document.getElementById('note').focus();
   </script>
 </body>
