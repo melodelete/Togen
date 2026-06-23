@@ -12,6 +12,7 @@ A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (ba
 - Hides on blur (click outside) or **Escape** key.
 - No dock/tray icon – runs completely in the background.
 - Built with Electron, modern JavaScript, and a preload script for secure IPC.
+- Slots,There are 3 slots where 2 and 3 are persistent and 1 is temporary
 
 ## Installation
 1. Install AppImage from [releases] (https://github.com/melodelete/Togen/releases)
@@ -24,6 +25,7 @@ A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (ba
 - Use **Ctrl + C** to copy selected text to the clipboard.
 - Use **Ctrl + V** to paste clipboard contents at the cursor.
 - Click outside the window or press **Escape** to hide it.
+- **Ctrl+1/2/3** To Change Slots
 
 ## Development
 1. **Clone** this repository.
@@ -71,7 +73,7 @@ Feel free to modify and redistribute as you wish.
 ## TODO / Ideas
 
 - Persistent Notes (Auto-save / Restore)
-- Multiple Notes / Slots
+- ~~Multiple Notes / Slots~~
 - Rich-text / Markdown Preview
 - Theme Switcher (Light / Dark / System)
 - Pin Note to Screen Edge

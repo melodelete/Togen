@@ -38,7 +38,7 @@
   <textarea id="note" placeholder="Type a quick note..."></textarea>
 
   <script>
-    // Clipboard handling for Clipboard functions (Ctrl+C, Ctrl+V, Ctrl+X)
+    // Clipboard handling for Ctrl+C / Ctrl+V
     document.addEventListener('keydown', async (e) => {
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
         if (e.key === 'c' || e.key === 'C') {
@@ -71,8 +71,56 @@
       }
     });
 
-    // Optional: autofocus on load (called from main.js)
-    // document.getElementById('note').focus();
+    // Initialize: load current note
+    async function initialize() {
+      try {
+        const note = await window.electronAPI.notes.getCurrent();
+        const textarea = document.getElementById('note');
+        textarea.value = note;
+        textarea.focus();
+      } catch (err) {
+        console.error('Failed to load initial note:', err);
+      }
+    }
+
+    // Save note on input with debounce
+    const textarea = document.getElementById('note');
+    let saveTimeout = null;
+    textarea.addEventListener('input', () => {
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(async () => {
+        try {
+          await window.electronAPI.notes.update(textarea.value);
+        } catch (err) {
+          console.error('Failed to save note:', err);
+        }
+      }, 500); // debounce 500ms
+    });
+
+    // Slot switching via Ctrl+1, Ctrl+2, Ctrl+3
+    document.addEventListener('keydown', async (e) => {
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+        const key = e.key;
+        if (key >= '1' && key <= '3') {
+          e.preventDefault();
+          const slotIndex = parseInt(key, 10) - 1;
+          try {
+            const note = await window.electronAPI.notes.setSlot(slotIndex);
+            textarea.value = note;
+            textarea.focus();
+          } catch (err) {
+            console.error('Failed to switch slot:', err);
+          }
+        }
+      }
+    });
+
+    // Initialize once DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initialize);
+    } else {
+      initialize();
+    }
   </script>
 </body>
 </html>
