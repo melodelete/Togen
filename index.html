@@ -116,6 +116,11 @@
     /* Placeholders */
     body.dark #note::placeholder { color: #c5c5c5; opacity: 0.6; }
     body.light #note::placeholder { color: #555; opacity: 0.6; }
+    /* Hide toolbar and hint in Electron version */
+    .electron .toolbar,
+    .electron .hint {
+      display: none !important;
+    }
   .hint {
   position: absolute;
   top: 70px;
@@ -147,7 +152,6 @@ body.web-demo.light .hint { color: rgba(0,0,0,0.5); }
 // Detect if running in browser/demo mode
 if (!window.electronAPI) {
   document.body.classList.add('web-demo');
-
   // Provide fallback electronAPI if not present (e.g., GitHub Pages)
   window.electronAPI = {
     clipboard: {
@@ -212,6 +216,8 @@ if (!window.electronAPI) {
       }
     }
   };
+} else {
+  document.body.classList.add('electron');
 }
 
 // Clipboard handling for Ctrl+C / Ctrl+V
@@ -368,8 +374,14 @@ if (document.readyState === 'loading') {
 // Theme handling
 function applyTheme(theme) {
   console.log('Applying theme:', theme);
-  // Set body classes to web-demo plus the theme only
-  document.body.className = 'web-demo ' + theme;
+  if (document.body.classList.contains('electron')) {
+    // Electron mode: keep electron class, just set light/dark
+    document.body.classList.remove('light', 'dark');
+    document.body.classList.add(theme);
+  } else {
+    // Web/demo mode
+    document.body.className = 'web-demo ' + theme;
+  }
 }
 
 // Get initial theme and apply
