@@ -36,3 +36,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: false
         timeout-minutes: 60
+        retry: 3
