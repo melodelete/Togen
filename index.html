@@ -218,6 +218,11 @@ if (!window.electronAPI) {
   };
 } else {
   document.body.classList.add('electron');
+  // Immediately hide toolbar and hint in Electron mode as backup
+  const toolbar = document.querySelector('.toolbar');
+  const hint = document.querySelector('.hint');
+  if (toolbar) toolbar.style.display = 'none';
+  if (hint) hint.style.display = 'none';
 }
 
 // Clipboard handling for Ctrl+C / Ctrl+V
