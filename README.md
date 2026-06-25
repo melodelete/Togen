@@ -16,9 +16,9 @@ A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (ba
 - Light/Dark Mode
 - Demo To try it out [Here](https://melodelete.github.io/Togen/)
 # Installation
-1. Install AppImage from [releases] (https://github.com/melodelete/Togen/releases)
-2. Grant Permissions To Run
-3. Run AppImage
+1. Install Your OS installer from [releases](https://github.com/melodelete/Togen/releases)
+2. Follow Instructions
+3. Enjoyyyy
 
 ## Usage
 - Press **Ctrl + `** (backtick) to toggle the note window.
