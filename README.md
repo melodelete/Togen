@@ -16,9 +16,9 @@ A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (ba
 - Light/Dark Mode
 - Demo To try it out [Here](https://melodelete.github.io/Togen/)
 # Installation
-1. Install AppImage from [releases](https://github.com/melodelete/Togen/releases)
+1. Install Your Platform Installation Type from [releases](https://github.com/melodelete/Togen/releases)
 2. Grant Permissions To Run
-3. Run AppImage
+3. Enjoy
 
 ## Usage
 - Press **Ctrl + `** (backtick) to toggle the note window.
@@ -29,6 +29,7 @@ A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (ba
 - **Ctrl+1/2/3** To Change Slots
 - **Ctrl+L/D** To change theme
 - **Ctrl+S** To save note as text file
+- **Ctrl+I** To open Settings window
 ## Development
 1. **Clone** this repository.
 2. Navigate to the project folder:
@@ -81,9 +82,9 @@ E for Electron App Only (Not a demo feature)
 - Quick-Insert Snippets
 - Sound / Visual Feedback
 - Tray / Menu Bar Icon (Optional)
-- Settings Window
+- ~~Settings Window~~ (E)
 - Drag-to-Move
-- ~~Save as Text (S)~~
+- ~~Save as Text (E)~~
 - Integration with Other Apps
 - Secure / Encrypted Notes (Optional)
 - Automatic Timestamp Header
