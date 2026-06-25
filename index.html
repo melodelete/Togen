@@ -116,7 +116,20 @@
     /* Placeholders */
     body.dark #note::placeholder { color: #c5c5c5; opacity: 0.6; }
     body.light #note::placeholder { color: #555; opacity: 0.6; }
-  </style>
+  .hint {
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+  pointer-events: none;
+  text-align: center;
+}
+body.web-demo.dark .hint { color: rgba(255,255,255,0.7); }
+body.web-demo.light .hint { color: rgba(0,0,0,0.5); }
+
+</style>
 </head>
 <body>
   <div class="toolbar">
@@ -125,6 +138,7 @@
     <button id="slot2" class="slot-btn">3</button>
     <button id="themeToggle" class="theme-btn">🌙</button>
   </div>
+  <div class="hint">In the Electron app, shortcuts work (Ctrl+` to show/hide, Ctrl+1/2/3 for slots, Ctrl+L/D for theme). In this web demo, use the buttons above.</div>
   <div class="togen-container">
     <textarea id="note" placeholder="Type a quick note..."></textarea>
   </div>
