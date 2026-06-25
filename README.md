@@ -1,15 +1,14 @@
 # Togen
 
-A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (backtick) to pop up a dark, semi‑transparent note window where you can type, copy, and paste text. The window hides when it loses focus or when you press **Escape**.
+A Spotlight‑like quick‑note utility made in Electron. Press **Ctrl + `** (backtick) to pop up a dark, semi‑transparent note window where you can type, copy, and paste text. The window hides when it loses focus or when you press **Escape**.
 
-![preview](preview.png) <!-- add a screenshot later -->
+![preview](preview.png)
 ![Light Mode](lightmode.png)
 ## Features
 
-- Global shortcut **Ctrl + `** to show/hide the note window.
-- Dark, semi‑transparent background with light text (Spotlight‑style).
-- Copy (**Ctrl + C**) and paste (**Ctrl + V**) via system clipboard.
-- Hides on blur (click outside) or **Escape** key.
+- Global shortcut to show/hide the note window.
+- Dark, semi‑transparent background with light text.
+- Clipboard Functions (Copy,Paste,Cut)
 - No dock/tray icon – runs completely in the background.
 - Built with Electron, modern JavaScript, and a preload script for secure IPC.
 - Slots: There are 3 slots where 2 and 3 are persistent and 1 is temporary
@@ -32,6 +31,9 @@ A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (ba
 - **Ctrl+I** To open Settings window
 ## Development
 1. **Clone** this repository.
+```bash
+git clone https://github.com/melodelete/Togen.git
+```
 2. Navigate to the project folder:
    ```bash
    cd path/to/togen
@@ -59,13 +61,11 @@ quick-note-electron/
 
 ### Making Changes
 
-After editing any file, simply restart the app:
+After editing any file, simply start the app using:
 
 ```bash
 npm start
 ```
-
-If you want to package the app for distribution, tools like [electron-forge](https://www.electronforge.io/) or [electron-builder](https://www.electron.build/) can be used.
 
 ## License
 
@@ -75,19 +75,18 @@ Feel free to modify and redistribute as you wish.
 
 ## TODO / Ideas
 E for Electron App Only (Not a demo feature)
-- Persistent Notes (Auto-save / Restore)
+- ~~Persistent Notes (Auto-save / Restore)~~
 - ~~Multiple Notes / Slots~~
 - ~~Theme Switcher (Light / Dark / System)~~
-- Pin Note to Screen Edge
+- Pin Note to Screen Edge (E)
 - Quick-Insert Snippets
-- Sound / Visual Feedback
-- Tray / Menu Bar Icon (Optional)
-- ~~Settings Window~~ (E)
+- Sound / Visual Feedback 
+- Tray / Menu Bar Icon (E)
+- Settings Window (E)
 - Drag-to-Move
 - ~~Save as Text (E)~~
 - Integration with Other Apps
-- Secure / Encrypted Notes (Optional)
-- Automatic Timestamp Header
+- Secure / Encrypted Notes
 - ~~OS support~~
 --- 
 
