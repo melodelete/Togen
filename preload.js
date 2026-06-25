@@ -12,6 +12,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getSlots: () => ipcRenderer.invoke('get-slots'),
     getTheme: () => ipcRenderer.invoke('get-theme'),
     setTheme: (theme) => ipcRenderer.invoke('set-theme', theme),
-    onThemeUpdate: (callback) => ipcRenderer.on('theme-changed', (event, theme) => callback(theme))
+    onThemeChange: (callback) => ipcRenderer.on('switch-theme', (event, theme) => callback(theme))
   }
 });

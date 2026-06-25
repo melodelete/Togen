@@ -123,6 +123,29 @@ function createWindow() {
       hideWindow();
     }
   });
+
+  // Register theme shortcuts when window is focused, unregister when blurred
+  win.on('focus', () => {
+    globalShortcut.register('CommandOrControl+L', () => {
+      if (win) {
+        currentTheme = 'light';
+        saveTheme();
+        win.webContents.send('switch-theme', currentTheme);
+      }
+    });
+    globalShortcut.register('CommandOrControl+D', () => {
+      if (win) {
+        currentTheme = 'dark';
+        saveTheme();
+        win.webContents.send('switch-theme', currentTheme);
+      }
+    });
+  });
+
+  win.on('blur', () => {
+    globalShortcut.unregister('CommandOrControl+L');
+    globalShortcut.unregister('CommandOrControl+D');
+  });
 }
 
 app.whenReady().then(async () => {
@@ -161,7 +184,7 @@ app.whenReady().then(async () => {
   });
   ipcMain.handle('get-slots', () => slots.slice());
 
-  // IPC handlers for theme
+  // IPC handlers for theme (kept for possible external use)
   ipcMain.handle('get-theme', () => currentTheme);
   ipcMain.handle('set-theme', (event, theme) => {
     if (theme === 'dark' || theme === 'light') {
@@ -169,7 +192,7 @@ app.whenReady().then(async () => {
       saveTheme();
       // Notify renderer to update UI
       if (win) {
-        win.webContents.send('theme-changed', currentTheme);
+        win.webContents.send('switch-theme', currentTheme);
       }
     }
     return currentTheme;
@@ -180,7 +203,7 @@ app.whenReady().then(async () => {
 
   // After window creates, send initial theme
   win.once('ready-to-show', () => {
-    win.webContents.send('theme-changed', currentTheme);
+    win.webContents.send('switch-theme', currentTheme);
   });
 
   // Try to register global shortcut for Ctrl + Backtick (`)
@@ -258,28 +281,6 @@ app.whenReady().then(async () => {
       console.error(`Failed to register slot shortcut: ${shortcut}`);
     }
   }
-
-  // Register theme switch shortcuts: Ctrl+L for light, Ctrl+D for dark
-  const lightShortcut = 'CommandOrControl+L';
-  const darkShortcut = 'CommandOrControl+D';
-  const lightRet = globalShortcut.register(lightShortcut, () => {
-    console.log('Light theme shortcut triggered');
-    if (win) {
-      currentTheme = 'light';
-      saveTheme();
-      win.webContents.send('theme-changed', currentTheme);
-    }
-  });
-  const darkRet = globalShortcut.register(darkShortcut, () => {
-    console.log('Dark theme shortcut triggered');
-    if (win) {
-      currentTheme = 'dark';
-      saveTheme();
-      win.webContents.send('theme-changed', currentTheme);
-    }
-  });
-  if (!lightRet) console.error('Failed to register light theme shortcut:', lightShortcut);
-  if (!darkRet) console.error('Failed to register dark theme shortcut:', darkShortcut);
 
   if (!registered) {
     console.error('Could not register any shortcut for Ctrl+Backtick');

@@ -101,7 +101,7 @@
             }
             return Promise.resolve(theme);
           },
-          onThemeUpdate: (callback) => {
+          onThemeChange: (callback) => {
             const handler = (e) => {
               if (e.key === 'togen-theme') {
                 callback(e.newValue === 'light' ? 'light' : 'dark');
@@ -214,8 +214,8 @@
     });
 
     // Listen for theme changes from main process (or storage fallback)
-    if (window.electronAPI?.notes?.onThemeUpdate) {
-      window.electronAPI.notes.onThemeUpdate(theme => {
+    if (window.electronAPI?.notes?.onThemeChange) {
+      window.electronAPI.notes.onThemeChange(theme => {
         applyTheme(theme);
       });
     } else {

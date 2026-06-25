@@ -2,7 +2,7 @@
 
 A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (backtick) to pop up a dark, semi‑transparent note window where you can type, copy, and paste text. The window hides when it loses focus or when you press **Escape**.
 
-![preview]   (preview.png) <!-- add a screenshot later -->
+![preview] (preview.png) <!-- add a screenshot later -->
 ![Light Mode](lightmode.png)
 ## Features
 
