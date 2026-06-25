@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getSlots: () => ipcRenderer.invoke('get-slots'),
     getTheme: () => ipcRenderer.invoke('get-theme'),
     setTheme: (theme) => ipcRenderer.invoke('set-theme', theme),
+    saveAsText: (text) => ipcRenderer.invoke('save-note-as-text', text),
     onThemeChange: (callback) => ipcRenderer.on('switch-theme', (event, theme) => callback(theme))
   }
 });

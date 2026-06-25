@@ -198,6 +198,39 @@ app.whenReady().then(async () => {
     return currentTheme;
   });
 
+  // IPC handler for saving note as text file
+  ipcMain.handle('save-note-as-text', async (event, text) => {
+    if (!text || text.trim() === '') {
+      return null;
+    }
+
+    const { dialog } = require('electron');
+    const timestamp = Date.now();
+    const defaultName = `togen-note-${timestamp}.txt`;
+
+    const { canceled, filePath } = await dialog.showSaveDialog({
+      title: 'Save Note',
+      defaultPath: path.join(app.getPath('documents'), defaultName),
+      buttonLabel: 'Save',
+      filters: [
+        { name: 'Text Files', extensions: ['txt'] },
+        { name: 'All Files', extensions: ['*'] }
+      ]
+    });
+
+    if (canceled || !filePath) {
+      return null;
+    }
+
+    try {
+      await fs.writeFile(filePath, text, 'utf8');
+      return filePath;
+    } catch (err) {
+      console.error('Failed to save note:', err);
+      return null;
+    }
+  });
+
   // Create window (hidden)
   createWindow();
 

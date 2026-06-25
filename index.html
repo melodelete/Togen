@@ -104,6 +104,7 @@
       background: rgba(0, 0, 0, 0.85);
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
     }
+
     /* Light Theme */
     body.light #note {
       background: rgba(255, 255, 255, 0.7);
@@ -213,6 +214,12 @@ if (!window.electronAPI) {
         };
         window.addEventListener('storage', handler);
         return () => window.removeEventListener('storage', handler);
+      },
+      // Stub for Electron-only saveAsText method (demo only - doesn't actually save)
+      saveAsText: (text) => {
+        // In web demo, we don't actually save files for security reasons
+        console.log('saveAsText called (web demo):', text.substring(0, 50) + '...');
+        return Promise.resolve();
       }
     }
   };
@@ -225,7 +232,7 @@ if (!window.electronAPI) {
   if (hint) hint.style.display = 'none';
 }
 
-// Clipboard handling for Ctrl+C / Ctrl+V
+// Clipboard handling for Ctrl+C / Ctrl+V and Save for Ctrl+S
 document.addEventListener('keydown', async (e) => {
   if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
     if (e.key === 'c' || e.key === 'C') {
@@ -253,6 +260,20 @@ document.addEventListener('keydown', async (e) => {
         console.log('Pasted from clipboard');
       } catch (err) {
         console.error('Failed to read clipboard:', err);
+      }
+    } else if (e.key === 's' || e.key === 'S') {
+      e.preventDefault();
+      try {
+        const textarea = document.getElementById('note');
+        const text = textarea.value;
+        if (text.trim() !== '') {
+          await window.electronAPI.notes.saveAsText(text);
+          console.log('Note saved as text file');
+        } else {
+          console.log('Note is empty, not saving');
+        }
+      } catch (err) {
+        console.error('Failed to save note as text file:', err);
       }
     }
   }
@@ -416,6 +437,17 @@ if (window.electronAPI?.notes?.onThemeChange) {
     }
   });
 }
+
+// Markdown preview functionality
+const noteTextarea = document.getElementById('note');
+// Preview functionality removed
+
+
+
+
+// Event listeners
+
+
 </script>
 </body>
 </html>
