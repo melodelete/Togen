@@ -37,6 +37,44 @@
       width: 100%;
       height: 100%;
     }
+    /* Toolbar for web demo */
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      justify-content: center;
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+    .slot-btn, .theme-btn {
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: rgba(255,255,255,0.1);
+      color: inherit;
+    }
+    .slot-btn.active {
+      background: rgba(255,255,255,0.2);
+    }
+    .theme-btn {
+      font-size: 20px;
+    }
+    /* Web-demo specific toolbar background */
+    body.web-demo .toolbar {
+      background: rgba(0,0,0,0.2);
+    }
+    body.web-demo.dark .toolbar {
+      background: rgba(255,255,255,0.1);
+    }
+    body.web-demo.light .toolbar {
+      background: rgba(0,0,0,0.1);
+    }
     #note {
       width: 100%;
       height: 100%;
@@ -81,6 +119,12 @@
   </style>
 </head>
 <body>
+  <div class="toolbar">
+    <button id="slot0" class="slot-btn">1</button>
+    <button id="slot1" class="slot-btn">2</button>
+    <button id="slot2" class="slot-btn">3</button>
+    <button id="themeToggle" class="theme-btn">🌙</button>
+  </div>
   <div class="togen-container">
     <textarea id="note" placeholder="Type a quick note..."></textarea>
   </div>
@@ -112,15 +156,20 @@ if (!window.electronAPI) {
     },
     notes: {
       getCurrent: () => {
-        const val = localStorage.getItem('togen-note');
-        return val ?? '';
+        const slots = JSON.parse(localStorage.getItem('togen-slots') || '["","",""]');
+        const current = parseInt(localStorage.getItem('togen-current-slot') || '0', 10);
+        return slots[current] ?? '';
       },
       update: (text) => {
-        localStorage.setItem('togen-note', text);
+        const slots = JSON.parse(localStorage.getItem('togen-slots') || '["","",""]');
+        const current = parseInt(localStorage.getItem('togen-current-slot') || '0', 10);
+        slots[current] = text;
+        localStorage.setItem('togen-slots', JSON.stringify(slots));
         return Promise.resolve();
       },
       setSlot: (index) => {
         const idx = Math.max(0, Math.min(2, Number(index)));
+        localStorage.setItem('togen-current-slot', idx.toString());
         const slots = JSON.parse(localStorage.getItem('togen-slots') || '["","",""]');
         return slots[idx] ?? '';
       },
@@ -218,14 +267,80 @@ document.addEventListener('keydown', async (e) => {
       e.preventDefault();
       const slotIndex = parseInt(key, 10) - 1;
       try {
+        console.log('Shortcut switching to slot', slotIndex);
         const note = await window.electronAPI.notes.setSlot(slotIndex);
         const textarea = document.getElementById('note');
         textarea.value = note ?? '';
         textarea.focus();
+        console.log('Loaded note via shortcut for slot', slotIndex, ':', note);
       } catch (err) {
         console.error('Failed to switch slot:', err);
       }
     }
+  }
+});
+
+// UI state
+let currentSlot = 0;
+let currentTheme = 'dark';
+
+async function updateSlotUI() {
+  // Update active class for slot buttons
+  document.querySelectorAll('.slot-btn').forEach((btn, idx) => {
+    btn.classList.toggle('active', idx === currentSlot);
+  });
+  // Update theme button icon
+  const themeBtn = document.getElementById('themeToggle');
+  themeBtn.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
+}
+
+// Load initial state and set UI
+(async () => {
+  try {
+    const theme = await window.electronAPI.notes.getTheme();
+    currentTheme = theme;
+  } catch (e) {}
+  try {
+    const storedSlot = localStorage.getItem('togen-current-slot');
+    if (storedSlot !== null) {
+      currentSlot = parseInt(storedSlot, 10);
+    }
+  } catch (e) {}
+  updateSlotUI();
+  await initialize();
+})();
+
+// Slot button clicks
+document.querySelectorAll('.slot-btn').forEach((btn, idx) => {
+  btn.addEventListener('click', async () => {
+    try {
+      console.log('Switching to slot', idx);
+      await window.electronAPI.notes.setSlot(idx);
+      currentSlot = idx;
+      // update note content
+      const note = await window.electronAPI.notes.getCurrent();
+      textarea.value = note ?? '';
+      textarea.focus();
+      console.log('Loaded note for slot', idx, ':', note);
+      updateSlotUI();
+    } catch (e) {
+      console.error('Failed to switch slot:', e);
+    }
+  });
+});
+
+// Theme toggle
+document.getElementById('themeToggle').addEventListener('click', async () => {
+  try {
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    console.log('Toggling theme to:', newTheme);
+    await window.electronAPI.notes.setTheme(newTheme);
+    currentTheme = newTheme;
+    console.log('Theme set, currentTheme:', currentTheme);
+    applyTheme(currentTheme);
+    updateSlotUI();
+  } catch (e) {
+    console.error('Failed to toggle theme:', e);
   }
 });
 
@@ -238,8 +353,9 @@ if (document.readyState === 'loading') {
 
 // Theme handling
 function applyTheme(theme) {
-  document.body.classList.remove('light', 'dark');
-  document.body.classList.add(theme);
+  console.log('Applying theme:', theme);
+  // Set body classes to web-demo plus the theme only
+  document.body.className = 'web-demo ' + theme;
 }
 
 // Get initial theme and apply
@@ -253,13 +369,19 @@ window.electronAPI.notes.getTheme().then(theme => {
 // Listen for theme changes from main process (or storage fallback)
 if (window.electronAPI?.notes?.onThemeChange) {
   window.electronAPI.notes.onThemeChange(theme => {
+    console.log('Theme changed via onThemeChange:', theme);
     applyTheme(theme);
+    currentTheme = theme;
+    updateSlotUI();
   });
 } else {
   // Fallback: listen to storage changes for theme
   window.addEventListener('storage', (e) => {
     if (e.key === 'togen-theme') {
+      console.log('Theme changed via storage event:', e.newValue);
       applyTheme(e.newValue === 'light' ? 'light' : 'dark');
+      currentTheme = e.newValue === 'light' ? 'light' : 'dark';
+      updateSlotUI();
     }
   });
 }
