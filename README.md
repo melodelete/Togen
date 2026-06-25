@@ -6,13 +6,13 @@ A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (ba
 ![Light Mode](lightmode.png)
 ## Features
 
-- Global shortcut **Ctrl + Shift + `** to show/hide the note window.
+- Global shortcut **Ctrl + `** to show/hide the note window.
 - Dark, semi‑transparent background with light text (Spotlight‑style).
 - Copy (**Ctrl + C**) and paste (**Ctrl + V**) via system clipboard.
 - Hides on blur (click outside) or **Escape** key.
 - No dock/tray icon – runs completely in the background.
 - Built with Electron, modern JavaScript, and a preload script for secure IPC.
-- Slots,There are 3 slots where 2 and 3 are persistent and 1 is temporary
+- Slots: There are 3 slots where 2 and 3 are persistent and 1 is temporary
 - Light/Dark Mode
 
 # Installation
@@ -27,7 +27,7 @@ A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (ba
 - Use **Ctrl + V** to paste clipboard contents at the cursor.
 - Click outside the window or press **Escape** to hide it.
 - **Ctrl+1/2/3** To Change Slots
-- **Ctrl+L/D** To chance theme
+- **Ctrl+L/D** To change theme
 ## Development
 1. **Clone** this repository.
 2. Navigate to the project folder:
