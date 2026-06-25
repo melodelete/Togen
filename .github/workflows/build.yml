@@ -35,4 +35,4 @@ jobs:
           # This token allows electron-builder to automatically draft a GitHub Release
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: false
-        timeout-minutes: 30
+        timeout-minutes: 60
