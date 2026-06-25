@@ -14,7 +14,7 @@ A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (ba
 - Built with Electron, modern JavaScript, and a preload script for secure IPC.
 - Slots: There are 3 slots where 2 and 3 are persistent and 1 is temporary
 - Light/Dark Mode
-
+- Demo To try it out [Here](https://melodelete.github.io/Togen/)
 # Installation
 1. Install AppImage from [releases] (https://github.com/melodelete/Togen/releases)
 2. Grant Permissions To Run
