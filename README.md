@@ -89,6 +89,8 @@ Feel free to modify and redistribute as you wish.
 - Secure / Encrypted Notes (Optional)
 - Automatic Timestamp Header
 - OS support
---- 
+
+## AI Declarence
+-AI has been used to review and optimize code
 
 Enjoy your quick‑note utility!
