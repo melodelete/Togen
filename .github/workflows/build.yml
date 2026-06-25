@@ -5,6 +5,10 @@ on:
     tags:
       - 'v*' # Triggers the workflow only when you push a version tag (e.g., v1.0.0)
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   release:
     name: Build for ${{ matrix.os }}
