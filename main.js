@@ -49,6 +49,33 @@ function resetSlot0() {
   scheduleSave();
 }
 
+// Theme persistence
+const THEME_FILE = path.join(app.getPath('userData'), 'theme.json');
+let currentTheme = 'dark'; // default
+
+async function loadTheme() {
+  try {
+    const data = await fs.readFile(THEME_FILE, 'utf8');
+    const parsed = JSON.parse(data);
+    if (parsed && (parsed.theme === 'dark' || parsed.theme === 'light')) {
+      currentTheme = parsed.theme;
+    } else {
+      currentTheme = 'dark';
+    }
+  } catch (err) {
+    // No file or error -> default dark
+    currentTheme = 'dark';
+  }
+}
+
+async function saveTheme() {
+  try {
+    await fs.writeFile(THEME_FILE, JSON.stringify({ theme: currentTheme }, null, 2));
+  } catch (err) {
+    console.error('Failed to save theme:', err);
+  }
+}
+
 function createWindow() {
   win = new BrowserWindow({
     width: 400,
@@ -99,8 +126,9 @@ function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  // Load persisted slots
+  // Load persisted slots and theme
   await loadSlots();
+  await loadTheme();
 
   // IPC handlers for clipboard
   console.log('Setting up IPC handlers');
@@ -131,10 +159,29 @@ app.whenReady().then(async () => {
     }
     return slots[currentSlot];
   });
-  ipcMain.handle('get-slots', () => slots.slice()); // return copy
+  ipcMain.handle('get-slots', () => slots.slice());
+
+  // IPC handlers for theme
+  ipcMain.handle('get-theme', () => currentTheme);
+  ipcMain.handle('set-theme', (event, theme) => {
+    if (theme === 'dark' || theme === 'light') {
+      currentTheme = theme;
+      saveTheme();
+      // Notify renderer to update UI
+      if (win) {
+        win.webContents.send('theme-changed', currentTheme);
+      }
+    }
+    return currentTheme;
+  });
 
   // Create window (hidden)
   createWindow();
+
+  // After window creates, send initial theme
+  win.once('ready-to-show', () => {
+    win.webContents.send('theme-changed', currentTheme);
+  });
 
   // Try to register global shortcut for Ctrl + Backtick (`)
   const shortcutsToTry = [
@@ -212,6 +259,28 @@ app.whenReady().then(async () => {
     }
   }
 
+  // Register theme switch shortcuts: Ctrl+L for light, Ctrl+D for dark
+  const lightShortcut = 'CommandOrControl+L';
+  const darkShortcut = 'CommandOrControl+D';
+  const lightRet = globalShortcut.register(lightShortcut, () => {
+    console.log('Light theme shortcut triggered');
+    if (win) {
+      currentTheme = 'light';
+      saveTheme();
+      win.webContents.send('theme-changed', currentTheme);
+    }
+  });
+  const darkRet = globalShortcut.register(darkShortcut, () => {
+    console.log('Dark theme shortcut triggered');
+    if (win) {
+      currentTheme = 'dark';
+      saveTheme();
+      win.webContents.send('theme-changed', currentTheme);
+    }
+  });
+  if (!lightRet) console.error('Failed to register light theme shortcut:', lightShortcut);
+  if (!darkRet) console.error('Failed to register dark theme shortcut:', darkShortcut);
+
   if (!registered) {
     console.error('Could not register any shortcut for Ctrl+Backtick');
   }
@@ -233,5 +302,6 @@ app.on('will-quit', () => {
   // Ensure final save before quitting
   if (saveTimeout) clearTimeout(saveTimeout);
   saveSlots().catch(console.error);
+  saveTheme().catch(console.error);
   globalShortcut.unregisterAll();
 });

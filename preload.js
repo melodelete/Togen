@@ -9,6 +9,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getCurrent: () => ipcRenderer.invoke('get-note'),
     update: (text) => ipcRenderer.invoke('update-note', text),
     setSlot: (index) => ipcRenderer.invoke('set-slot', index),
-    getSlots: () => ipcRenderer.invoke('get-slots')
+    getSlots: () => ipcRenderer.invoke('get-slots'),
+    getTheme: () => ipcRenderer.invoke('get-theme'),
+    setTheme: (theme) => ipcRenderer.invoke('set-theme', theme),
+    onThemeUpdate: (callback) => ipcRenderer.on('theme-changed', (event, theme) => callback(theme))
   }
 });

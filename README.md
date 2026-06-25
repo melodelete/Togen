@@ -3,7 +3,7 @@
 A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (backtick) to pop up a dark, semi‑transparent note window where you can type, copy, and paste text. The window hides when it loses focus or when you press **Escape**.
 
 ![preview](preview.png) <!-- add a screenshot later -->
-
+![Light Mode](lightmode.png)
 ## Features
 
 - Global shortcut **Ctrl + Shift + `** to show/hide the note window.
@@ -13,7 +13,7 @@ A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (ba
 - No dock/tray icon – runs completely in the background.
 - Built with Electron, modern JavaScript, and a preload script for secure IPC.
 - Slots,There are 3 slots where 2 and 3 are persistent and 1 is temporary
-
+- Light/Dark Mode
 ## Installation
 1. Install AppImage from [releases] (https://github.com/melodelete/Togen/releases)
 2. Grant Permissons To Run
@@ -26,7 +26,7 @@ A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (ba
 - Use **Ctrl + V** to paste clipboard contents at the cursor.
 - Click outside the window or press **Escape** to hide it.
 - **Ctrl+1/2/3** To Change Slots
-
+- **Ctrl+L/D** To chance theme
 ## Development
 1. **Clone** this repository.
 2. Navigate to the project folder:
@@ -75,7 +75,7 @@ Feel free to modify and redistribute as you wish.
 - Persistent Notes (Auto-save / Restore)
 - ~~Multiple Notes / Slots~~
 - Rich-text / Markdown Preview
-- Theme Switcher (Light / Dark / System)
+- ~~Theme Switcher (Light / Dark / System)~~
 - Pin Note to Screen Edge
 - Quick-Insert Snippets
 - Global Search / Find-in-Note
@@ -87,7 +87,7 @@ Feel free to modify and redistribute as you wish.
 - Integration with Other Apps
 - Secure / Encrypted Notes (Optional)
 - Automatic Timestamp Header
-
+- OS support
 --- 
 
 Enjoy your quick‑note utility!

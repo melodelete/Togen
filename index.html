@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Quick Note</title>
+  <title>Togen</title>
   <style>
     html, body {
       margin: 0;
@@ -32,7 +32,20 @@
       color: #c5c5c5;
       opacity: 0.6;
     }
-  </style>
+    /* Theme styles */
+    body.dark #note {
+      background: rgba(0, 0, 0, 0.7);
+      color: #fafafa;
+    }
+    body.light #note {
+      background: rgba(255, 255, 255, 0.7);
+      color: #222;
+    }
+    body.light #note::placeholder {
+      color: #555;
+      opacity: 0.6;
+    }
+</style>
 </head>
 <body>
   <textarea id="note" placeholder="Type a quick note..."></textarea>
@@ -121,6 +134,21 @@
     } else {
       initialize();
     }
+
+    // Theme handling
+    function applyTheme(theme) {
+      document.body.className = theme;
+    }
+
+    // Get initial theme and apply
+    window.electronAPI.notes.getTheme().then(theme => {
+      applyTheme(theme);
+    });
+
+    // Listen for theme changes from main process
+    window.electronAPI.notes.onThemeUpdate(theme => {
+      applyTheme(theme);
+    });
   </script>
 </body>
 </html>
