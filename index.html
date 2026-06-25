@@ -8,224 +8,261 @@
       margin: 0;
       padding: 0;
       height: 100%;
+      width: 100%;
       background: transparent;
       overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    /* These styles ONLY apply on GitHub Pages/Web browsers */
+    body.web-demo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    body.web-demo.dark {
+      background-color: #1a1c1e;
+    }
+    body.web-demo.light {
+      background-color: #f0f2f5;
+    }
+    /* The wrapper container only activates its sizing on the web */
+    body.web-demo .togen-container {
+      width: 90%;
+      max-width: 650px;
+      height: 120px;
+    }
+    /* Default application styling (Electron behaves normally here) */
+    .togen-container {
+      width: 100%;
+      height: 100%;
     }
     #note {
       width: 100%;
       height: 100%;
       box-sizing: border-box;
       padding: 12px 16px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Canton, 'Helvetica Neue', sans-serif;
       font-size: 16px;
       resize: none;
       border: none;
       outline: none;
-      background: rgba(0, 0, 0, 0.7);
+      line-height: 1.4;
+      transition: background 0.2s, color 0.2s;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      color: #fafafa;
-      line-height: 1.4;
     }
-    /* Placeholder styling */
-    #note::placeholder {
-      color: #c5c5c5;
-      opacity: 0.6;
+    /* Electron handles its own borders; Web demo gets a nice drop shadow */
+    body.web-demo #note {
+      border-radius: 14px;
+      font-size: 18px;
+      padding: 16px 20px;
     }
-    /* Theme styles */
+    /* Dark Theme */
     body.dark #note {
       background: rgba(0, 0, 0, 0.7);
       color: #fafafa;
     }
+    body.web-demo.dark #note {
+      background: rgba(0, 0, 0, 0.85);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    }
+    /* Light Theme */
     body.light #note {
       background: rgba(255, 255, 255, 0.7);
       color: #222;
     }
-    body.light #note::placeholder {
-      color: #555;
-      opacity: 0.6;
+    body.web-demo.light #note {
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
     }
+    /* Placeholders */
+    body.dark #note::placeholder { color: #c5c5c5; opacity: 0.6; }
+    body.light #note::placeholder { color: #555; opacity: 0.6; }
   </style>
 </head>
 <body>
-  <textarea id="note" placeholder="Type a quick note..."></textarea>
+  <div class="togen-container">
+    <textarea id="note" placeholder="Type a quick note..."></textarea>
+  </div>
 
-<script>
-    // Provide fallback electronAPI if not present (e.g., GitHub Pages)
-    if (!window.electronAPI) {
-      window.electronAPI = {
-        clipboard: {
-          writeText: async (text) => {
-            try {
-              await navigator.clipboard.writeText(text);
-            } catch (err) {
-              console.error('Clipboard write failed:', err);
-              throw err;
-            }
-          },
-          readText: async () => {
-            try {
-              return await navigator.clipboard.readText();
-            } catch (err) {
-              console.error('Clipboard read failed:', err);
-              throw err;
-            }
-          }
-        },
-        notes: {
-          getCurrent: () => {
-            const val = localStorage.getItem('togen-note');
-            return val ?? '';
-          },
-          update: (text) => {
-            localStorage.setItem('togen-note', text);
-            return Promise.resolve();
-          },
-          setSlot: (index) => {
-            const idx = Math.max(0, Math.min(2, Number(index)));
-            const slots = JSON.parse(localStorage.getItem('togen-slots') || '["","",""]');
-            // For demo, just return current slot content; UI update handled elsewhere
-            return slots[idx] ?? '';
-          },
-          getSlots: () => {
-            return JSON.parse(localStorage.getItem('togen-slots') || '["","",""]');
-          },
-          getTheme: () => {
-            return localStorage.getItem('togen-theme') || 'dark';
-          },
-          setTheme: (theme) => {
-            if (theme === 'light' || theme === 'dark') {
-              localStorage.setItem('togen-theme', theme);
-              // Dispatch storage event for other tabs/windows
-              window.dispatchEvent(new StorageEvent('storage', { key: 'togen-theme', newValue: theme }));
-            }
-            return Promise.resolve(theme);
-          },
-          onThemeChange: (callback) => {
-            const handler = (e) => {
-              if (e.key === 'togen-theme') {
-                callback(e.newValue === 'light' ? 'light' : 'dark');
-              }
-            };
-            window.addEventListener('storage', handler);
-            // Return a cleanup function (optional)
-            return () => window.removeEventListener('storage', handler);
-          }
+  <script>
+// Detect if running in browser/demo mode
+if (!window.electronAPI) {
+  document.body.classList.add('web-demo');
+
+  // Provide fallback electronAPI if not present (e.g., GitHub Pages)
+  window.electronAPI = {
+    clipboard: {
+      writeText: async (text) => {
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (err) {
+          console.error('Clipboard write failed:', err);
+          throw err;
         }
-      };
-    }
-
-    // Clipboard handling for Ctrl+C / Ctrl+V
-    document.addEventListener('keydown', async (e) => {
-      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
-        if (e.key === 'c' || e.key === 'C') {
-          e.preventDefault();
-          const text = window.getSelection().toString();
-          if (text) {
-            try {
-              await window.electronAPI.clipboard.writeText(text);
-              console.log('Copied to clipboard:', text);
-            } catch (err) {
-              console.error('Failed to write clipboard:', err);
-            }
-          }
-        } else if (e.key === 'v' || e.key === 'V') {
-          e.preventDefault();
-          try {
-            const text = await window.electronAPI.clipboard.readText();
-            const textarea = document.getElementById('note');
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const value = textarea.value;
-            textarea.value = value.slice(0, start) + text + value.slice(end);
-            textarea.selectionStart = textarea.selectionEnd = start + text.length;
-            textarea.focus();
-            console.log('Pasted from clipboard');
-          } catch (err) {
-            console.error('Failed to read clipboard:', err);
-          }
+      },
+      readText: async () => {
+        try {
+          return await navigator.clipboard.readText();
+        } catch (err) {
+          console.error('Clipboard read failed:', err);
+          throw err;
         }
       }
-    });
+    },
+    notes: {
+      getCurrent: () => {
+        const val = localStorage.getItem('togen-note');
+        return val ?? '';
+      },
+      update: (text) => {
+        localStorage.setItem('togen-note', text);
+        return Promise.resolve();
+      },
+      setSlot: (index) => {
+        const idx = Math.max(0, Math.min(2, Number(index)));
+        const slots = JSON.parse(localStorage.getItem('togen-slots') || '["","",""]');
+        return slots[idx] ?? '';
+      },
+      getSlots: () => {
+        return JSON.parse(localStorage.getItem('togen-slots') || '["","",""]');
+      },
+      getTheme: () => {
+        return localStorage.getItem('togen-theme') || 'dark';
+      },
+      setTheme: (theme) => {
+        if (theme === 'light' || theme === 'dark') {
+          localStorage.setItem('togen-theme', theme);
+          // Dispatch storage event for other tabs/windows
+          window.dispatchEvent(new StorageEvent('storage', { key: 'togen-theme', newValue: theme }));
+        }
+        return Promise.resolve(theme);
+      },
+      onThemeChange: (callback) => {
+        const handler = (e) => {
+          if (e.key === 'togen-theme') {
+            callback(e.newValue === 'light' ? 'light' : 'dark');
+          }
+        };
+        window.addEventListener('storage', handler);
+        return () => window.removeEventListener('storage', handler);
+      }
+    }
+  };
+}
 
-    // Initialize: load current note
-    async function initialize() {
+// Clipboard handling for Ctrl+C / Ctrl+V
+document.addEventListener('keydown', async (e) => {
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+    if (e.key === 'c' || e.key === 'C') {
+      e.preventDefault();
+      const text = window.getSelection().toString();
+      if (text) {
+        try {
+          await window.electronAPI.clipboard.writeText(text);
+          console.log('Copied to clipboard:', text);
+        } catch (err) {
+          console.error('Failed to write clipboard:', err);
+        }
+      }
+    } else if (e.key === 'v' || e.key === 'V') {
+      e.preventDefault();
       try {
-        const note = await window.electronAPI.notes.getCurrent();
+        const text = await window.electronAPI.clipboard.readText();
+        const textarea = document.getElementById('note');
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const value = textarea.value;
+        textarea.value = value.slice(0, start) + text + value.slice(end);
+        textarea.selectionStart = textarea.selectionEnd = start + text.length;
+        textarea.focus();
+        console.log('Pasted from clipboard');
+      } catch (err) {
+        console.error('Failed to read clipboard:', err);
+      }
+    }
+  }
+});
+
+// Initialize: load current note
+async function initialize() {
+  try {
+    const note = await window.electronAPI.notes.getCurrent();
+    const textarea = document.getElementById('note');
+    textarea.value = note ?? '';
+    textarea.focus();
+  } catch (err) {
+    console.error('Failed to load initial note:', err);
+  }
+}
+
+// Save note on input with debounce
+const textarea = document.getElementById('note');
+let saveTimeout = null;
+textarea.addEventListener('input', () => {
+  clearTimeout(saveTimeout);
+  setTimeout(async () => {
+    try {
+      await window.electronAPI.notes.update(textarea.value);
+    } catch (err) {
+      console.error('Failed to save note:', err);
+    }
+  }, 500);
+});
+
+// Slot switching via Ctrl+1, Ctrl+2, Ctrl+3 (also handle Cmd on mac)
+document.addEventListener('keydown', async (e) => {
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+    const key = e.key;
+    if (key >= '1' && key <= '3') {
+      e.preventDefault();
+      const slotIndex = parseInt(key, 10) - 1;
+      try {
+        const note = await window.electronAPI.notes.setSlot(slotIndex);
         const textarea = document.getElementById('note');
         textarea.value = note ?? '';
         textarea.focus();
       } catch (err) {
-        console.error('Failed to load initial note:', err);
+        console.error('Failed to switch slot:', err);
       }
     }
+  }
+});
 
-    // Save note on input with debounce
-    const textarea = document.getElementById('note');
-    let saveTimeout = null;
-    textarea.addEventListener('input', () => {
-      clearTimeout(saveTimeout);
-      setTimeout(async () => {
-        try {
-          await window.electronAPI.notes.update(textarea.value);
-        } catch (err) {
-          console.error('Failed to save note:', err);
-        }
-      }, 500);
-    });
+// Initialize once DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initialize);
+} else {
+  initialize();
+}
 
-    // Slot switching via Ctrl+1, Ctrl+2, Ctrl+3 (also handle Cmd on mac)
-    document.addEventListener('keydown', async (e) => {
-      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
-        const key = e.key;
-        if (key >= '1' && key <= '3') {
-          e.preventDefault();
-          const slotIndex = parseInt(key, 10) - 1;
-          try {
-            const note = await window.electronAPI.notes.setSlot(slotIndex);
-            const textarea = document.getElementById('note');
-            textarea.value = note ?? '';
-            textarea.focus();
-          } catch (err) {
-            console.error('Failed to switch slot:', err);
-          }
-        }
-      }
-    });
+// Theme handling
+function applyTheme(theme) {
+  document.body.classList.remove('light', 'dark');
+  document.body.classList.add(theme);
+}
 
-    // Initialize once DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initialize);
-    } else {
-      initialize();
+// Get initial theme and apply
+window.electronAPI.notes.getTheme().then(theme => {
+  applyTheme(theme ?? 'dark');
+}).catch(() => {
+  const stored = localStorage.getItem('togen-theme');
+  applyTheme(stored === 'light' ? 'light' : 'dark');
+});
+
+// Listen for theme changes from main process (or storage fallback)
+if (window.electronAPI?.notes?.onThemeChange) {
+  window.electronAPI.notes.onThemeChange(theme => {
+    applyTheme(theme);
+  });
+} else {
+  // Fallback: listen to storage changes for theme
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'togen-theme') {
+      applyTheme(e.newValue === 'light' ? 'light' : 'dark');
     }
-
-    // Theme handling
-    function applyTheme(theme) {
-      document.body.className = theme;
-    }
-
-    // Get initial theme and apply
-    window.electronAPI.notes.getTheme().then(theme => {
-      applyTheme(theme ?? 'dark');
-    }).catch(() => {
-      const stored = localStorage.getItem('togen-theme');
-      applyTheme(stored === 'light' ? 'light' : 'dark');
-    });
-
-    // Listen for theme changes from main process (or storage fallback)
-    if (window.electronAPI?.notes?.onThemeChange) {
-      window.electronAPI.notes.onThemeChange(theme => {
-        applyTheme(theme);
-      });
-    } else {
-      // Fallback: listen to storage changes for theme
-      window.addEventListener('storage', (e) => {
-        if (e.key === 'togen-theme') {
-          applyTheme(e.newValue === 'light' ? 'light' : 'dark');
-        }
-      });
-    }
-  </script>
+  });
+}
+</script>
 </body>
 </html>

@@ -2,7 +2,7 @@
 
 A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (backtick) to pop up a dark, semi‑transparent note window where you can type, copy, and paste text. The window hides when it loses focus or when you press **Escape**.
 
-![preview] (preview.png) <!-- add a screenshot later -->
+![preview](preview.png) <!-- add a screenshot later -->
 ![Light Mode](lightmode.png)
 ## Features
 
@@ -17,7 +17,7 @@ A Spotlight‑like quick‑note utility for Electron. Press **Ctrl + `** (ba
 
 # Installation
 1. Install AppImage from [releases] (https://github.com/melodelete/Togen/releases)
-2. Grant Permissons To Run
+2. Grant Permissions To Run
 3. Run AppImage
 
 ## Usage
