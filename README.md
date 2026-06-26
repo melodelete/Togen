@@ -57,7 +57,7 @@ MIT © MeloDelete
 
 ## AI Declarence
 
-AI was used to optimize code, to review bugs, For Ideas, This Readme.md was written by AI but has been rewritten
+AI was used to optimize code, to review bugs, For Ideas, This Readme.md was written by AI but has been rewritten,and Helped Setup the demo
 
 ## Ideas
 E for Electron App Only (Not a demo feature)
