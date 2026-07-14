@@ -221,6 +221,11 @@ if (!window.electronAPI) {
         // In web demo, we don't actually save files for security reasons
         console.log('saveAsText called (web demo):', text.substring(0, 50) + '...');
         return Promise.resolve();
+      },
+      moveToCorner: (corner) => {
+        // In web demo, we can't move the window
+        console.log('moveToCorner called (web demo):', corner);
+        return Promise.resolve();
       }
     }
   };
@@ -322,6 +327,32 @@ document.addEventListener('keydown', async (e) => {
         console.log('Loaded note via shortcut for slot', slotIndex, ':', note);
       } catch (err) {
         console.error('Failed to switch slot:', err);
+      }
+    }
+  }
+});
+
+// Pin to screen edge via Ctrl+Shift+Arrow (Ctrl+Shift+Left, Right, Up, Down)
+document.addEventListener('keydown', async (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && !e.altKey) {
+    const key = e.key;
+    let corner = null;
+    if (key === 'ArrowLeft') {
+      corner = 'top-left';
+    } else if (key === 'ArrowRight') {
+      corner = 'top-right';
+    } else if (key === 'ArrowUp') {
+      corner = 'top-center';
+    } else if (key === 'ArrowDown') {
+      corner = 'bottom-center';
+    }
+    if (corner) {
+      e.preventDefault();
+      try {
+        await window.electronAPI.notes.moveToCorner(corner);
+        console.log('Pinned window to', corner);
+      } catch (err) {
+        console.error('Failed to pin window:', err);
       }
     }
   }

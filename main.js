@@ -17,6 +17,38 @@ function hideWindow() {
   }
 }
 
+function pinToCorner(corner) {
+  if (!win) return;
+  const { screen } = require('electron');
+  const display = screen.getDisplayMatching(win.getBounds());
+  const { x: screenX, y: screenY, width: screenW, height: screenH } = display.workArea;
+  const winBounds = win.getBounds();
+  const winW = winBounds.width;
+  const winH = winBounds.height;
+  let newX, newY;
+  switch (corner) {
+    case 'top-left':
+      newX = screenX;
+      newY = screenY;
+      break;
+    case 'top-right':
+      newX = screenX + screenW - winW;
+      newY = screenY;
+      break;
+    case 'top-center':
+      newX = screenX + Math.round((screenW - winW) / 2);
+      newY = screenY;
+      break;
+    case 'bottom-center':
+      newX = screenX + Math.round((screenW - winW) / 2);
+      newY = screenY + screenH - winH;
+      break;
+    default:
+      return;
+  }
+  win.setBounds({ x: newX, y: newY });
+}
+
 async function loadSlots() {
   try {
     const data = await fs.readFile(SLOTS_FILE, 'utf8');
@@ -140,11 +172,28 @@ function createWindow() {
         win.webContents.send('switch-theme', currentTheme);
       }
     });
+    // Pin-to-corner shortcuts
+    globalShortcut.register('CommandOrControl+Shift+Left', () => {
+      pinToCorner('top-left');
+    });
+    globalShortcut.register('CommandOrControl+Shift+Right', () => {
+      pinToCorner('top-right');
+    });
+    globalShortcut.register('CommandOrControl+Shift+Up', () => {
+      pinToCorner('top-center');
+    });
+    globalShortcut.register('CommandOrControl+Shift+Down', () => {
+      pinToCorner('bottom-center');
+    });
   });
 
   win.on('blur', () => {
     globalShortcut.unregister('CommandOrControl+L');
     globalShortcut.unregister('CommandOrControl+D');
+    globalShortcut.unregister('CommandOrControl+Shift+Left');
+    globalShortcut.unregister('CommandOrControl+Shift+Right');
+    globalShortcut.unregister('CommandOrControl+Shift+Up');
+    globalShortcut.unregister('CommandOrControl+Shift+Down');
   });
 }
 
@@ -196,6 +245,11 @@ app.whenReady().then(async () => {
       }
     }
     return currentTheme;
+  });
+
+  // IPC handler for pinning window to screen corner/edge
+  ipcMain.handle('pin-to-corner', (event, corner) => {
+    pinToCorner(corner);
   });
 
   // IPC handler for saving note as text file
